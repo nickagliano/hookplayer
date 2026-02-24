@@ -1,0 +1,10 @@
+sounds_dir = "~/.config/hookplayer/sounds"
+volume = 0.5
+
+[events]
+start      = ["dota2_invoker/ThusIInvokeMyself.mp3", "league_of_legends/LOL_WelcomeToSR.wav"]
+stop       = ["dota2_invoker/GloriousInvocation.mp3", "league_of_legends/LOL_Victory.wav"]
+notify     = ["dota2_invoker/Behold.mp3", "league_of_legends/LOL_OnMyWay.wav"]
+permission = ["dota2_invoker/Denied.mp3", "league_of_legends/LOL_AssistMe.wav"]
+error      = ["dota2_invoker/Lamentable.mp3", "league_of_legends/LOL_YouHaveBeenSlain.wav"]
+unknown    = ["dota2_invoker/Invoker.mp3"]
