@@ -61,9 +61,44 @@ pub fn update() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn is_newer(latest: &str, current: &str) -> bool {
+pub(crate) fn is_newer(latest: &str, current: &str) -> bool {
     let parse = |v: &str| -> Vec<u64> {
         v.split('.').filter_map(|p| p.parse().ok()).collect()
     };
     parse(latest) > parse(current)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn newer_patch() {
+        assert!(is_newer("0.1.1", "0.1.0"));
+    }
+
+    #[test]
+    fn newer_minor() {
+        assert!(is_newer("0.2.0", "0.1.9"));
+    }
+
+    #[test]
+    fn newer_major() {
+        assert!(is_newer("1.0.0", "0.9.9"));
+    }
+
+    #[test]
+    fn not_newer_equal() {
+        assert!(!is_newer("0.1.0", "0.1.0"));
+    }
+
+    #[test]
+    fn not_newer_older() {
+        assert!(!is_newer("0.1.0", "0.2.0"));
+    }
+
+    #[test]
+    fn handles_double_digit_minor() {
+        assert!(is_newer("0.10.0", "0.9.0"));
+    }
 }
