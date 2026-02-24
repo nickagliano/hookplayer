@@ -10,6 +10,7 @@ jobs:
     name: Build ${{ matrix.asset }}
     runs-on: ${{ matrix.runner }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - target: aarch64-apple-darwin
@@ -32,6 +33,10 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
+
+      - name: Install ALSA headers (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get install -y libasound2-dev
 
       - name: Build
         run: cargo build --release --target ${{ matrix.target }}
