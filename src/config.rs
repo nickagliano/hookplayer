@@ -67,6 +67,34 @@ pub fn set_sounds_dir(new_path: &str) -> Result<PathBuf, Box<dyn std::error::Err
     Ok(expand_tilde(new_path))
 }
 
+/// Replaces the [events] section in the config file with the given map.
+pub fn set_events(events: &HashMap<String, Vec<String>>) -> Result<(), Box<dyn std::error::Error>> {
+    let path = config_path()?;
+    let raw = std::fs::read_to_string(&path)?;
+
+    // Keep everything before [events]
+    let preamble = if let Some(idx) = raw.find("[events]") {
+        raw[..idx].trim_end().to_string() + "\n\n"
+    } else {
+        raw.trim_end().to_string() + "\n\n"
+    };
+
+    // Write events in a consistent order
+    let order = ["start", "stop", "notify", "permission", "error", "unknown"];
+    let mut section = String::from("[events]\n");
+    for event in &order {
+        if let Some(sounds) = events.get(*event) {
+            if !sounds.is_empty() {
+                let quoted: Vec<String> = sounds.iter().map(|s| format!("\"{}\"", s)).collect();
+                section.push_str(&format!("{:<10} = [{}]\n", event, quoted.join(", ")));
+            }
+        }
+    }
+
+    std::fs::write(&path, format!("{}{}", preamble, section))?;
+    Ok(())
+}
+
 pub fn expand_tilde(path: &str) -> PathBuf {
     if let Some(stripped) = path.strip_prefix("~/") {
         if let Ok(home) = std::env::var("HOME") {

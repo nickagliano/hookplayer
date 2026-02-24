@@ -69,6 +69,30 @@ fn main() {
                 }
             }
         }
+        "use" => {
+            let packs_arg = match args.get(2) {
+                Some(p) => p,
+                None => {
+                    eprintln!("hookplayer: usage: hookplayer use <pack>[,pack2,...]");
+                    std::process::exit(1);
+                }
+            };
+            let pack_names: Vec<&str> = packs_arg.split(',').map(|s| s.trim()).collect();
+            println!("Configuring events from: {}", pack_names.join(", "));
+            match registry::build_events_for_packs(&pack_names) {
+                Ok(events) => {
+                    if let Err(e) = config::set_events(&events) {
+                        eprintln!("hookplayer: {}", e);
+                        std::process::exit(1);
+                    }
+                    println!("Done. Config updated.");
+                }
+                Err(e) => {
+                    eprintln!("hookplayer: {}", e);
+                    std::process::exit(1);
+                }
+            }
+        }
         "packs" => {
             let cfg = load_config();
             let sounds_dir = cfg.sounds_dir_abs();
@@ -96,7 +120,12 @@ fn main() {
             let sounds = cfg.sounds_for_event(event);
 
             if sounds.is_empty() {
-                // No sounds configured — exit silently
+                if cfg.events.is_empty() {
+                    eprintln!(
+                        "hookplayer: no sounds configured.\n\
+                         Run 'hookplayer list' to browse packs, then 'hookplayer use <pack>' to get started."
+                    );
+                }
                 return;
             }
 
