@@ -80,6 +80,10 @@ pub fn set_events(events: &HashMap<String, Vec<String>>) -> Result<(), Box<dyn s
     };
 
     // Write events in a consistent order
+    // PORT: EVENTS
+    // The canonical event order written to config by `hookplayer use <pack>`.
+    // Add new event names here to have them recognized and serialized.
+    // Note: custom events can also be added directly to config.toml without touching source.
     let order = ["start", "stop", "notify", "permission", "error", "unknown"];
     let mut section = String::from("[events]\n");
     for event in &order {

@@ -3,6 +3,9 @@ use std::collections::{HashMap, HashSet};
 use std::io::Write;
 use std::path::Path;
 
+// PORT: REGISTRY_URL
+// Change this to point at your own pack registry.
+// The endpoint must return JSON shaped as: { "packs": [ { name, display_name, source_repo, source_ref, source_path } ] }
 const REGISTRY_URL: &str = "https://peonping.github.io/registry/index.json";
 
 #[derive(Debug, Deserialize)]
@@ -150,6 +153,9 @@ fn pack_base_url(pack: &RegistryPack) -> String {
     }
 }
 
+// PORT: CATEGORY_MAP
+// Maps openpeon sound pack categories to hookplayer event names.
+// Edit this to change which pack sounds get assigned to which events by `hookplayer use <pack>`.
 fn category_to_event(category: &str) -> Option<&'static str> {
     match category {
         "session.start" => Some("start"),

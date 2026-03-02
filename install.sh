@@ -56,3 +56,7 @@ case ":$PATH:" in
   *":$INSTALL_DIR:"*) ;;
   *) echo "Warning: $INSTALL_DIR is not in your PATH. Add it to your shell config." ;;
 esac
+
+echo ""
+echo "To wire hookplayer into Claude Code, run:"
+echo "  hookplayer setup"

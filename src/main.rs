@@ -1,6 +1,7 @@
 mod config;
 mod player;
 mod registry;
+mod setup;
 mod updater;
 
 use rand::seq::SliceRandom;
@@ -16,6 +17,13 @@ fn main() {
         "update" => {
             if let Err(e) = updater::update() {
                 eprintln!("hookplayer: update failed: {}", e);
+                std::process::exit(1);
+            }
+        }
+        "setup" => {
+            let yes = args.iter().any(|a| a == "--yes" || a == "-y");
+            if let Err(e) = setup::run(yes) {
+                eprintln!("hookplayer: setup failed: {}", e);
                 std::process::exit(1);
             }
         }
