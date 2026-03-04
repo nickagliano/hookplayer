@@ -20,20 +20,23 @@ case "$ARCH" in
   *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
 esac
 
-# Fetch latest release tag
-LATEST=$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" \
-  | grep '"tag_name"' \
-  | sed 's/.*"tag_name": *"\(.*\)".*/\1/')
-
-if [ -z "$LATEST" ]; then
-  echo "Could not determine latest release."
-  exit 1
+# Resolve version: EPM injects EPM_PACKAGE_VERSION; fall back to latest GitHub release
+if [ -n "${EPM_PACKAGE_VERSION:-}" ]; then
+  VERSION="v${EPM_PACKAGE_VERSION}"
+else
+  VERSION=$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" \
+    | grep '"tag_name"' \
+    | sed 's/.*"tag_name": *"\(.*\)".*/\1/')
+  if [ -z "$VERSION" ]; then
+    echo "Could not determine latest release."
+    exit 1
+  fi
 fi
 
 ASSET="hookplayer-${OS}-${ARCH}"
-URL="https://github.com/${REPO}/releases/download/${LATEST}/${ASSET}"
+URL="https://github.com/${REPO}/releases/download/${VERSION}/${ASSET}"
 
-echo "Installing hookplayer ${LATEST} (${OS}/${ARCH})..."
+echo "Installing hookplayer ${VERSION} (${OS}/${ARCH})..."
 
 mkdir -p "$INSTALL_DIR"
 curl -fsSL "$URL" -o "$INSTALL_DIR/hookplayer"
